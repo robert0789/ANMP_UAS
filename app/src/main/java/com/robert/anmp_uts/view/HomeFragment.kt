@@ -46,13 +46,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val sharedPrefs = requireContext().getSharedPreferences("com.robert.anmp_uts", Context.MODE_PRIVATE)
-
-        //check the user session
-        if(!sharedPrefs.contains("id")){
-            val action = HomeFragmentDirections.actionHomeLogin()
-            Navigation.findNavController(binding.root).navigate(action)
-        }
 
 
         viewModel = ViewModelProvider(this).get(NewsListViewModel::class.java)

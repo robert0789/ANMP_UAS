@@ -16,19 +16,19 @@ import com.google.gson.reflect.TypeToken
 import com.robert.anmp_uts.model.User
 import org.json.JSONObject
 
-class LoginViewModel(application: Application): AndroidViewModel(application) {
-    val userIDLD = MutableLiveData<Int>()
+    class LoginViewModel(application: Application): AndroidViewModel(application) {
+    val userIDLD = MutableLiveData<Int>(0)
     val loadingLD = MutableLiveData<Boolean>()
     val userLoadErrorLD = MutableLiveData<Boolean>()
     val statusLD = MutableLiveData<String>()
 
-    // Reference to the SharedViewModel
-    private val sharedViewModel: SharedViewModel by lazy {
-        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-            .create(SharedViewModel::class.java)
-    }
-    val TAG = "volleyUserTag"
+    val TAG = "volleyTag"
     private var queue: RequestQueue?=null
+    override fun onCleared() {
+        super.onCleared()
+        queue?.cancelAll(TAG)
+    }
+
 
 
     //namanya bisa fetch, load
@@ -40,9 +40,12 @@ class LoginViewModel(application: Application): AndroidViewModel(application) {
 
         loadingLD.value = true
         userLoadErrorLD.value = false
+        queue?.cancelAll(TAG)
 
+        if (queue == null) {
+            queue = Volley.newRequestQueue(getApplication())
+        }
         val url = "http://10.0.2.2/anmp/uts/login.php"
-        queue = Volley.newRequestQueue(getApplication())
 
         val stringRequest = object : StringRequest(
             Request.Method.POST,
@@ -52,17 +55,22 @@ class LoginViewModel(application: Application): AndroidViewModel(application) {
                 if (obj.getString("result") == "OK"){
                     userIDLD.value = obj.getInt("data")
                     Log.d("show_volley_user", userIDLD.value.toString())
-                    loadingLD.value = false
                     statusLD.value = "Login successful"
                     Log.d("show_volley", statusLD.value.toString())
 
-
-                    //cache user id in shared view model
-                    sharedViewModel.setUserId(userIDLD.value!!)
                 }
+
+                else{
+                    statusLD.value = "username or password is incorrect"
+
+                }
+                Log.d("show_volley_user", userIDLD.value.toString())
+
             },
             {
                 Log.d("show_volley", it.toString())
+                Log.d("show_volley_user", userIDLD.value.toString())
+
 
             }
 

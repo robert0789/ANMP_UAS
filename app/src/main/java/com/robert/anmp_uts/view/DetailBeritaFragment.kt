@@ -56,6 +56,7 @@ class DetailBeritaFragment : Fragment() {
         observeViewModel()
 
 
+
         binding.btnNext.setOnClickListener{
             if(article.size  > article_index +1){
                 article_index += 1

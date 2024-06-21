@@ -65,7 +65,6 @@ class LoginFragment : Fragment() {
     fun observeViewModel(){
         viewModel.statusLD.observe(viewLifecycleOwner, Observer {
             if (viewModel.userIDLD.value !=0){
-                Toast.makeText(requireContext(), viewModel.statusLD.value, Toast.LENGTH_SHORT).show()
                 val sharedPrefs = requireContext().getSharedPreferences("com.robert.anmp_uts", Context.MODE_PRIVATE)
                 var editor: SharedPreferences.Editor = sharedPrefs.edit()
 
@@ -74,9 +73,6 @@ class LoginFragment : Fragment() {
 
                 val action = LoginFragmentDirections.actionLoginMain()
                 Navigation.findNavController(binding.root).navigate(action)
-            }
-            else{
-                Toast.makeText(requireContext(), viewModel.statusLD.value.toString(), Toast.LENGTH_SHORT).show()
             }
             Toast.makeText(requireContext(), viewModel.statusLD.value.toString(), Toast.LENGTH_SHORT).show()
 

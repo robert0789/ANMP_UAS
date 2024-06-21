@@ -3,30 +3,21 @@ package com.robert.anmp_uts.view
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.robert.anmp_uts.R
-import com.robert.anmp_uts.databinding.FragmentDetailBeritaBinding
 import com.robert.anmp_uts.databinding.FragmentProfileBinding
-import com.robert.anmp_uts.model.User
-import com.robert.anmp_uts.viewmodel.LoginViewModel
 import com.robert.anmp_uts.viewmodel.ProfileViewModel
-import com.robert.anmp_uts.viewmodel.SharedViewModel
 
 class ProfileFragment : Fragment() {
 
     private lateinit var binding : FragmentProfileBinding
     private lateinit var viewModel:ProfileViewModel
-    private lateinit var  sharedviewModel: SharedViewModel
 
     var userID  = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +41,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //initializing view model to start observe live data
-        sharedviewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 
         val userID = getUserIDFromPreference()
