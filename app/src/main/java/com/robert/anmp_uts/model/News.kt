@@ -14,6 +14,7 @@ data class News(
     @SerializedName("image_url")
     val imageURL : String,
     val date: Date
+    //robert puki
 )
 
 
