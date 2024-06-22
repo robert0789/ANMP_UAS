@@ -10,26 +10,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.robert.anmp_uts.databinding.FragmentSignUpBinding
+import com.robert.anmp_uts.model.User
 import com.robert.anmp_uts.viewmodel.LoginViewModel
 import com.robert.anmp_uts.viewmodel.SignUpViewModel
+import com.robert.anmp_uts.viewmodel.UserDetailViewModel
 
 
-class SignUpFragment : Fragment() {
+class SignUpFragment : Fragment(), UserSignUpClickListener {
 
     private lateinit var binding: FragmentSignUpBinding
-    private lateinit var viewModel: SignUpViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var viewModel: UserDetailViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        viewModel = ViewModelProvider(this).get(SignUpViewModel::class.java)
 
         binding = FragmentSignUpBinding.inflate(inflater, container, false)
         return binding.root
@@ -40,64 +36,36 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnRegister.setOnClickListener{
-            val username = binding.txtUsername.text.toString()
-            val firstName = binding.txtFirstNAme.text.toString()
-            val lastName = binding.txtLastName.text.toString()
-            val email = binding.txtEmail.text.toString()
-            val password = binding.txtPassword.text.toString()
-            val repeatPassword = binding.txtRePassword.text.toString()
+        binding.user = User("","","","","","")
+        viewModel =ViewModelProvider(this).get(UserDetailViewModel::class.java)
+        binding.addlistener = this
+
+    }
 
 
-            if(password != repeatPassword){
-                Toast.makeText(requireContext(), "password and repeat password are not same", Toast.LENGTH_SHORT).show()
+    override fun onUserSignUpClick(v: View) {
+        val firstName = binding.txtFirstNAme.text.toString().trim()
+        val lastName = binding.txtLastName.text.toString().trim()
+        val username = binding.txtUsername.text.toString().trim()
+        val email = binding.txtEmail.text.toString().trim()
+        val password = binding.txtPassword.text.toString().trim()
+        val repeatPassword = binding.txtRePassword.text.toString().trim()
 
-            }
-
-            else{
-                viewModel.signUp(username, firstName,lastName,email,password,"")
-                observeViewModel()
-
-            }
+        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || repeatPassword.isEmpty()) {
+            Toast.makeText(view?.context, "Please fill in all fields", Toast.LENGTH_LONG).show()
+            return
         }
 
+        if (password != repeatPassword) {
+            Toast.makeText(view?.context, "Passwords do not match", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        // Semua validasi terpenuhi, lakukan pendaftaran user
+        viewModel.addTodo(binding.user!!)
+        Toast.makeText(view?.context, "Data added", Toast.LENGTH_LONG).show()
+        Navigation.findNavController(v).popBackStack()
     }
 
-    fun observeViewModel(){
-        viewModel.successSignUpLD.observe(viewLifecycleOwner, Observer {
-            if (it == true){
-                val action = SignUpFragmentDirections.actionSignupLogin()
-                Navigation.findNavController(binding.root).navigate(action)
-
-            }
-            else{
-                Toast.makeText(requireContext(), "there is something wrong", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-//        viewModel.userLD.observe(viewLifecycleOwner, Observer {
-//            if(it != null){
-//                binding.txtError.visibility = View.VISIBLE
-//            }
-//
-//            else{
-//                binding.txtError.visibility = View.GONE
-//            }
-//        })
-//
-//        viewModel.loadingLD.observe(viewLifecycleOwner, Observer {
-//            if(it == true){
-//                binding.progressLoad.visibility = View.VISIBLE
-//                binding.recView.visibility = View.GONE
-//
-//            }
-//
-//            else{
-//                binding.progressLoad.visibility = View.GONE
-//                binding.recView.visibility = View.VISIBLE
-//
-//            }
-//        })
-    }
 
 }

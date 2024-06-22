@@ -1,17 +1,25 @@
 package com.robert.anmp_uts.model
 
-import com.google.gson.annotations.SerializedName
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity
 data class User(
-    val id : Int,
-    val username: String,
-    @SerializedName("first_name")
-    val firstName: String,
-    @SerializedName("last_name")
-    val lastName: String,
-    val email: String,
-    val password: String,
-    @SerializedName("image_url")
-    val imageURL: String
+    @ColumnInfo("username")
+    var username: String,
+    @ColumnInfo("firstName")
+    var firstName: String,
+    @ColumnInfo("lastName")
+    var lastName: String,
+    @ColumnInfo("email")
+    var email: String,
+    @ColumnInfo("password")
+    var password: String,
+    @ColumnInfo("imageURL")
+    var imageURL: String
 
-)
+){
+    @PrimaryKey(autoGenerate = true)
+    var id:Int =0
+}
