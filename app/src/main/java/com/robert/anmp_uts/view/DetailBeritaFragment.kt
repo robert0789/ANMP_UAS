@@ -6,29 +6,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.robert.anmp_uts.R
 import com.robert.anmp_uts.databinding.FragmentDetailBeritaBinding
-import com.robert.anmp_uts.model.Article
 import com.robert.anmp_uts.viewmodel.NewsDetailViewModel
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.schedulers.Schedulers
-import java.lang.Exception
-import java.util.concurrent.TimeUnit
 
-class DetailBeritaFragment : Fragment() {
-    private var param1: String? = null
-    private var param2: String? = null
+class DetailBeritaFragment : Fragment(), LoadAuthorNameListener, NewsContentListener {
+
 
     private lateinit var binding :FragmentDetailBeritaBinding
     private lateinit var viewModel:NewsDetailViewModel
-    var imageURL = ""
-    var article_index = 0
-    var article = arrayListOf<Article>()
+    var content_index = 0
+    var num_content = 0
+    var newsContents = listOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -45,71 +35,103 @@ class DetailBeritaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val newsID = arguments?.getInt("newsID")
-        imageURL = arguments?.getString("imageURL")!!
 
-        binding.txtTitleDetail.text = arguments?.getString("newsTitle")!!
-        binding.txtAuthorDetail.text = arguments?.getString("newsAuthor")!!
+        val newsID = arguments?.getInt("newsID") ?: 0
+        Log.d("news id", newsID.toString())
 
+//        val newsID = arguments?.getInt("newsID")
+//        imageURL = arguments?.getString("imageURL")!!
+//
+//        binding.txtTitleDetail.text = arguments?.getString("newsTitle")!!
+//        binding.txtAuthorDetail.text = arguments?.getString("newsAuthor")!!
+//
         viewModel = ViewModelProvider(this).get(NewsDetailViewModel::class.java)
-        viewModel.get_article(newsID!!)
+        binding.newscontentlistener = this//        viewModel.get_article(newsID!!)
+
+        viewModel.refresh(newsID)
         observeViewModel()
 
 
 
-        binding.btnNext.setOnClickListener{
-            if(article.size  > article_index +1){
-                article_index += 1
-                binding.txtContent.text = article[article_index].paragraph
-                binding.btnNext.isEnabled = article.size != article_index
-            }
 
-        }
-
-        binding.btnPrev.setOnClickListener{
-            if(0 < article_index){
-                article_index -= 1
-                binding.txtContent.text = article[article_index].paragraph
-                binding.btnPrev.isEnabled = article.size != article_index
-
-            }
-
-        }
+//
+//        binding.btnNext.setOnClickListener{
+//            if(article.size  > article_index +1){
+//                article_index += 1
+//                binding.txtContent.text = article[article_index].paragraph
+//                binding.btnNext.isEnabled = article.size != article_index
+//            }
+//
+//        }
+//
+//        binding.btnPrev.setOnClickListener{
+//            if(0 < article_index){
+//                article_index -= 1
+//                binding.txtContent.text = article[article_index].paragraph
+//                binding.btnPrev.isEnabled = article.size != article_index
+//
+//            }
+//
+//        }
     }
 
     fun observeViewModel(){
 
-        viewModel.articleLD.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            article = it
+        viewModel.newsLD.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                Log.d("DetailBeritaFragment", "Observed news: $it")
+                binding.news = it
+                newsContents = it.detail.split('/')
+                Log.d("NewsDetailFragment", "newscontent: $newsContents")
+                num_content = newsContents.size
+                Log.d("NewsDetailFragment", "news num content: $num_content")
 
-            Log.d("article", article.toString())
+                viewModel.newsContent.value = newsContents[0]
+                binding.viewModel = viewModel
 
-            binding.txtContent.text =article[0].paragraph
-
-            val picasso = Picasso.Builder(requireContext())
-            picasso.listener{
-                    picasso,uri, exception->
-                exception.printStackTrace()
             }
 
-            //callback untuk ngetahui image berhasil diload
-            picasso.build().load(imageURL).into(binding.imageView2, object:
-                Callback {
-                override fun onSuccess() {
-                    binding.imageView2.visibility = View.VISIBLE
+            else{
+                Log.e("DetailBeritaFragment", "Observed news is null")
 
-                }
+            }
 
-                override fun onError(e: Exception?) {
-                    Log.e("picasso error", e.toString())
-                }
-            })
+//            binding.viewModel = viewModel
+
 
         })
 
 
+
     }
 
+    override fun onLoadAuthorNameListener(authorId: Int): String {
+        var authorName = ""
+        viewModel.getAuthorName(authorId) { name ->
+            authorName = name
+        }
+        return authorName    }
+
+
+    override fun onNextNewsContentListener(v: View) {
+        if(content_index + 1 < num_content ){
+            content_index += 1
+            viewModel.newsContent.value = newsContents[content_index]
+            binding.viewModel = viewModel
+
+
+
+        }
+    }
+
+    override fun onPreviousNewsContentListener(v: View) {
+        if(content_index > 0){
+            content_index -= 1
+            viewModel.newsContent.value = newsContents[content_index]
+            binding.viewModel = viewModel
+
+        }
+    }
 
 
 

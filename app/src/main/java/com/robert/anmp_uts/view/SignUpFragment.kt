@@ -62,7 +62,7 @@ class SignUpFragment : Fragment(), UserSignUpClickListener {
         }
 
         // Semua validasi terpenuhi, lakukan pendaftaran user
-        viewModel.addTodo(binding.user!!)
+        viewModel.addUser(binding.user!!)
         Toast.makeText(view?.context, "Data added", Toast.LENGTH_LONG).show()
         Navigation.findNavController(v).popBackStack()
     }

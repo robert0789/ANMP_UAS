@@ -9,3 +9,18 @@ interface UserSignUpClickListener{
 interface UserLoginClickListener{
     fun onUserLoginClick(v: View)
 }
+
+interface NewsDetailClickListener{
+    fun onNewsDetailClickListener(v: View)
+}
+
+interface LoadAuthorNameListener{
+    fun onLoadAuthorNameListener(authorId : Int) : String
+}
+
+interface NewsContentListener{
+    fun onNextNewsContentListener(v: View)
+    fun onPreviousNewsContentListener(v: View)
+
+}
+

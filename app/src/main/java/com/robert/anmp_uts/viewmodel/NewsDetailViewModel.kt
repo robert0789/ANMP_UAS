@@ -4,65 +4,63 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.robert.anmp_uts.model.Article
 import com.robert.anmp_uts.model.News
-import org.json.JSONObject
+import com.robert.anmp_uts.model.NewsDB
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-class NewsDetailViewModel(application: Application): AndroidViewModel(application) {
+class NewsDetailViewModel(application: Application): AndroidViewModel(application), CoroutineScope {
     //life data berupa arr data supaya adapter bisa nerima data
-    val articleLD = MutableLiveData<ArrayList<Article>>()
+    val newsLD = MutableLiveData<News>()
+    val newsContent = MutableLiveData<String>()
     val loadingLD = MutableLiveData<Boolean>()
     val newsLoadErrorLD = MutableLiveData<Boolean>()
+    private var job = Job()
 
-    val TAG = "volleyTag"
-    private var queue: RequestQueue?=null
+    override val coroutineContext: CoroutineContext
+        //dijalankan di thread io
+        get() = job + Dispatchers.IO
+    fun refresh(id: Int) {
+        loadingLD.value = true // Set loading state
+        launch {
+            val newsDb = NewsDB.buildDatabase(
+                getApplication()
+            )
+            val news = newsDb.newsDao().selectNews(id)
+            newsLD.postValue(news)
 
-    override fun onCleared() {
-        super.onCleared()
-        queue?.cancelAll(TAG)
-    }
+            Log.d("NewsDetailViewModel", "News value: $news")
+            if (newsLD.value != null) {
+                // Update newsLD on the main thread
+                Log.d("NewsDetailViewModel", "NewsLD value: ${newsLD.value}")
+            } else {
+                Log.e("NewsDetailViewModel", "News object is null for id: $id")
+                // Handle null case here if needed
+            }
+            try {
 
-    //namanya bisa fetch, load
-    fun get_article(newsID : Int){
-
-        loadingLD.value = true
-        newsLoadErrorLD.value = false
-
-
-        val url = "http://10.0.2.2/anmp/uts/get_article.php?id=$newsID"
-        queue = Volley.newRequestQueue(getApplication())
-
-        val stringRequest = StringRequest(
-            Request.Method.GET,
-            url,
-            {
-                loadingLD.value = false
-                //it berisi json string
-                Log.d("show_volley", it)
-                //object untuk gson
-                val obj = JSONObject(it)
-                if(obj.getString("result")=="OK"){
-                    val sType = object: TypeToken<List<Article>>() {}.type
-                    val result = Gson().fromJson<List<Article>>(obj.getJSONArray("data").toString(), sType)
-                    articleLD.value = result as ArrayList<Article>
-                }
-            },
-            {
-                Log.d("show_volley", it.toString())
-
+            } catch (e: Exception) {
+                Log.e("NewsDetailViewModel", "Error refreshing news", e)
+                // Handle error case if needed
+            } finally {
+                loadingLD.postValue(false) // Clear loading state
             }
 
-        )
-
-        stringRequest.tag =TAG
-        queue?.add(stringRequest)
-
     }
 
+
+
+
+}
+
+    fun getAuthorName(id: Int, callback: (String) -> Unit) {
+        launch {
+            val newsDb = NewsDB.buildDatabase(getApplication())
+            val authorName = newsDb.newsDao().selectAuthorName(id)
+            callback(authorName)
+        }
+    }
 }

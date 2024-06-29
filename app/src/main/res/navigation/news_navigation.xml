@@ -47,15 +47,6 @@
         <argument
             android:name="newsID"
             app:argType="integer" />
-        <argument
-            android:name="imageURL"
-            app:argType="string" />
-        <argument
-            android:name="newsAuthor"
-            app:argType="string" />
-        <argument
-            android:name="newsTitle"
-            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"

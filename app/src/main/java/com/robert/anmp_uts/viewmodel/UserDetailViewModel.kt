@@ -16,7 +16,7 @@ class UserDetailViewModel (application: Application)
     private val job = Job()
     val userLD = MutableLiveData<User>()
 
-    fun addTodo(user: User) { //bisa pake list
+    fun addUser(user: User) { //bisa pake list
         launch {
             val db = buildDb(
                 getApplication()

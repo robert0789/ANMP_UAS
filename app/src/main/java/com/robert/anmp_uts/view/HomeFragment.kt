@@ -2,6 +2,7 @@ package com.robert.anmp_uts.view
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +22,7 @@ import com.robert.anmp_uts.viewmodel.NewsListViewModel
 class HomeFragment : Fragment() {
     private lateinit var binding :FragmentHomeBinding
     private lateinit var viewModel : NewsListViewModel
-    private val newsListAdapter = NewsAdapter(arrayListOf())
+    private val newsListAdapter = NewsAdapter(arrayListOf(), arrayListOf())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,10 +50,12 @@ class HomeFragment : Fragment() {
 
 
         viewModel = ViewModelProvider(this).get(NewsListViewModel::class.java)
+        viewModel.loadData()
         viewModel.refresh()
 
         binding.recView.layoutManager = LinearLayoutManager(context)
         binding.recView.adapter = newsListAdapter
+
 
         observeViewModel()
 
@@ -71,6 +74,11 @@ class HomeFragment : Fragment() {
     fun observeViewModel(){
         viewModel.newsLD.observe(viewLifecycleOwner, Observer {
             newsListAdapter.updateNewsList(it)
+            Log.d("news data", it.toString())
+        })
+
+        viewModel.authorLD.observe(viewLifecycleOwner, Observer {
+            newsListAdapter.updateAuthorList(it)
         })
 
 //        viewModel.studentLoadErrorLD.observe(viewLifecycleOwner, Observer {
