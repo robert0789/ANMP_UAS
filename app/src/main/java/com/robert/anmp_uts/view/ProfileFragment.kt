@@ -3,6 +3,7 @@ package com.robert.anmp_uts.view
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,66 +13,37 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.robert.anmp_uts.databinding.FragmentProfileBinding
+import com.robert.anmp_uts.model.User
 import com.robert.anmp_uts.viewmodel.ProfileViewModel
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(), UserChangeNameClickListener, UserChangePasswordClickListener {
 
-    private lateinit var binding : FragmentProfileBinding
-    private lateinit var viewModel:ProfileViewModel
-
-    var userID  = 0
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var binding: FragmentProfileBinding
+    private lateinit var viewModel: ProfileViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
-        // Inflate the layout for this fragment
         return binding.root
-
-
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //initializing view model to start observe live data
+
         viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
+
+        binding.changenamelistener = this
+        binding.changepasslistener = this
 
         val userID = getUserIDFromPreference()
         viewModel.fetch(userID)
         observeViewModel()
 
-        binding.btnChangePassword.setOnClickListener{
-            val oldPassword = binding.txtOldPassword.text.toString()
-            val newPassword = binding.txtNewPassword.text.toString()
-            val repeatNewPassword = binding.txtRepeatNewPassword.text.toString()
-
-            val status = viewModel.changePassword(oldPassword, newPassword, repeatNewPassword)
-            Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show()
-        }
-
-        binding.btnChangeName.setOnClickListener{
-
-            val firstName = binding.txtFirstName.text.toString()
-            val lastName = binding.txtLastName.text.toString()
-
-            val status = viewModel.changeName(firstName, lastName)
-            Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show()
-
-
-        }
-
-        binding.btnLogOut.setOnClickListener{
+        binding.btnLogOut.setOnClickListener {
             val sharedPrefs = requireContext().getSharedPreferences("com.robert.anmp_uts", Context.MODE_PRIVATE)
             val editor: SharedPreferences.Editor = sharedPrefs.edit()
-
-// Clearing the SharedPreferences
             editor.clear()
             editor.apply()
 
@@ -80,19 +52,44 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun getUserIDFromPreference(): Int{
+    private fun getUserIDFromPreference(): Int {
         val sharedPrefs = requireContext().getSharedPreferences("com.robert.anmp_uts", Context.MODE_PRIVATE)
-        val idUser = sharedPrefs.getString("id", "0")
-        return idUser!!.toInt()
-
+        return sharedPrefs.getInt("id", 0)
     }
 
-    fun observeViewModel(){
-        viewModel.userLD.observe(viewLifecycleOwner, Observer {
-            binding.txtFirstName.setText(it.firstName)
-            binding.txtLastName.setText(it.lastName)
-            binding.txtUserNamePrefs.setText(it.username)
+    private fun observeViewModel() {
+        viewModel.userLD.observe(viewLifecycleOwner, Observer { user ->
+            if (user != null) {
+                binding.user = user
+            } else {
+                Log.e("ProfileFragment", "User data is null")
+            }
         })
+    }
 
+    override fun onUserChangeNameClick(view: View, user: User) {
+        if (user != null) {
+            viewModel.changeName(user.firstName, user.lastName, user.id)
+            Toast.makeText(view.context, "User first name and last name changed", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(view.context, "User data is not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onUserChangePasswordClick(view: View, user: User) {
+        val newPassword = binding.txtNewPassword.text.toString()
+        val repeatNewPassword = binding.txtRepeatNewPassword.text.toString()
+
+        if (newPassword != repeatNewPassword) {
+            Toast.makeText(view.context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+        } else {
+            if (user != null) {
+                viewModel.changePassword(newPassword, user.id)
+                Toast.makeText(view.context, "User password changed", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(view.context, "User data is not available", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
+

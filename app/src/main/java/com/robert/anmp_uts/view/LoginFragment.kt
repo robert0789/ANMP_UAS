@@ -1,5 +1,6 @@
 package com.robert.anmp_uts.view
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -47,6 +48,8 @@ class LoginFragment : Fragment(), UserLoginClickListener {
             if (user != null) {
                 Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
 
+                saveUserIDToPreference(requireContext(), user.id)
+
                 // Pindah ke halaman lain setelah login berhasil
                 val action = LoginFragmentDirections.actionLoginMain()
                 Navigation.findNavController(binding.root).navigate(action)
@@ -70,5 +73,13 @@ class LoginFragment : Fragment(), UserLoginClickListener {
             Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun saveUserIDToPreference(context: Context, userID: Int) {
+        val sharedPrefs = context.getSharedPreferences("com.robert.anmp_uts", Context.MODE_PRIVATE)
+        val editor = sharedPrefs.edit()
+        editor.putInt("id", userID)
+        editor.apply()
+    }
+
 
 }

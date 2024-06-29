@@ -39,11 +39,6 @@ class UserDetailViewModel (application: Application)
         }
     }
 
-    fun update(user: User) {
-        launch {
-            buildDb(getApplication()).userDao().updateUser(user)
-        }
-    }
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
 }

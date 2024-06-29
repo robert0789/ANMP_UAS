@@ -21,8 +21,11 @@ interface UserDao {
     @Delete
     fun deleteUser(user: User)
 
-    @Query("UPDATE user SET firstName=:firstName, lastName=:lastName, " + "password=:password WHERE id=:id")
-    fun update(id: Int,firstName:String, lastName:String, password:String)
+    @Query("UPDATE user SET firstName=:firstName, lastName=:lastName WHERE id=:id")
+    fun changeName(id: Int,firstName:String, lastName:String)
+
+    @Query("UPDATE user SET password=:password WHERE id=:id")
+    fun changePassword(id: Int,password:String)
 
     @Update
     fun updateUser(user: User)}
