@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.robert.anmp_uts.model.News
+import com.robert.anmp_uts.model.NewsAuthor
 import com.robert.anmp_uts.model.NewsDB
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ import kotlin.coroutines.CoroutineContext
 class NewsDetailViewModel(application: Application): AndroidViewModel(application), CoroutineScope {
     //life data berupa arr data supaya adapter bisa nerima data
     val newsLD = MutableLiveData<News>()
+    val authorLD = MutableLiveData<NewsAuthor>()
     val newsContent = MutableLiveData<String>()
     val loadingLD = MutableLiveData<Boolean>()
     val newsLoadErrorLD = MutableLiveData<Boolean>()
@@ -30,7 +32,9 @@ class NewsDetailViewModel(application: Application): AndroidViewModel(applicatio
                 getApplication()
             )
             val news = newsDb.newsDao().selectNews(id)
+            val author = newsDb.newsDao().selectAuthorName(news.author)
             newsLD.postValue(news)
+            authorLD.postValue(author)
 
             Log.d("NewsDetailViewModel", "News value: $news")
             if (newsLD.value != null) {
@@ -55,12 +59,12 @@ class NewsDetailViewModel(application: Application): AndroidViewModel(applicatio
 
 
 }
-
-    fun getAuthorName(id: Int, callback: (String) -> Unit) {
-        launch {
-            val newsDb = NewsDB.buildDatabase(getApplication())
-            val authorName = newsDb.newsDao().selectAuthorName(id)
-            callback(authorName)
-        }
-    }
+//
+//    fun getAuthorName(id: Int, callback: (String) -> Unit) {
+//        launch {
+//            val newsDb = NewsDB.buildDatabase(getApplication())
+//            val authorName = newsDb.newsDao().selectAuthorName(id)
+//            callback(authorName)
+//        }
+//    }
 }

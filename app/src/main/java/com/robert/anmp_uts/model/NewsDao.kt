@@ -29,8 +29,8 @@ interface NewsDao {
     @Query("SELECT u.id, u.username FROM user u INNER JOIN news n ON u.id = n.author")
     fun selectAuthorsName() : List<NewsAuthor>
 
-    @Query("SELECT username FROM user where id =:id")
-    fun selectAuthorName(id: Int) : String
+    @Query("SELECT id, username FROM user where id =:id")
+    fun selectAuthorName(id: Int) : NewsAuthor
 
     @Query("DELETE FROM news")
     fun deleteAllNews()

@@ -8,8 +8,8 @@
             name="news"
             type="com.robert.anmp_uts.model.News" />
         <variable
-            name="authorlistener"
-            type="com.robert.anmp_uts.view.LoadAuthorNameListener" />
+            name="author"
+            type="com.robert.anmp_uts.model.NewsAuthor" />
         <variable
             name="newscontentlistener"
             type="com.robert.anmp_uts.view.NewsContentListener" />
@@ -72,7 +72,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:text="@{authorlistener.onLoadAuthorNameListener(news.id)}"
+                        android:text="@{author.username}"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/txtTitleDetail" />
 
@@ -91,9 +91,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="Next"
+                        android:layout_marginBottom="32dp"
                         android:onClick="@{newscontentlistener::onNextNewsContentListener}"
+                        android:text="Next"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -102,9 +102,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="32dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="Previous"
+                        android:layout_marginBottom="32dp"
                         android:onClick="@{newscontentlistener::onPreviousNewsContentListener}"
+                        android:text="Previous"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/btnNext" />
                 </androidx.constraintlayout.widget.ConstraintLayout>

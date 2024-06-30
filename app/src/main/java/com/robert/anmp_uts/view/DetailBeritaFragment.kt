@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.robert.anmp_uts.databinding.FragmentDetailBeritaBinding
 import com.robert.anmp_uts.viewmodel.NewsDetailViewModel
 
-class DetailBeritaFragment : Fragment(), LoadAuthorNameListener, NewsContentListener {
+class DetailBeritaFragment : Fragment(), NewsContentListener {
 
 
     private lateinit var binding :FragmentDetailBeritaBinding
@@ -88,6 +88,27 @@ class DetailBeritaFragment : Fragment(), LoadAuthorNameListener, NewsContentList
 
                 viewModel.newsContent.value = newsContents[0]
                 binding.viewModel = viewModel
+//                val currContent = binding.viewModel.newsContent.value
+//                Log.d("NewsDetailFragment", "news current content: $currContent")
+
+            }
+
+            else{
+                Log.e("DetailBeritaFragment", "Observed news is null")
+
+            }
+
+//            binding.viewModel = viewModel
+
+
+        })
+
+        viewModel.authorLD.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                Log.d("NewsDetailFragment", "Observed news: $it")
+                binding.author = it
+//                val currContent = binding.viewModel.newsContent.value
+//                Log.d("NewsDetailFragment", "news current content: $currContent")
 
             }
 
@@ -102,15 +123,15 @@ class DetailBeritaFragment : Fragment(), LoadAuthorNameListener, NewsContentList
         })
 
 
-
     }
 
-    override fun onLoadAuthorNameListener(authorId: Int): String {
-        var authorName = ""
-        viewModel.getAuthorName(authorId) { name ->
-            authorName = name
-        }
-        return authorName    }
+//    override fun onLoadAuthorNameListener(authorId: Int): String {
+//        var authorName = ""
+//        Log.d("NewsDetailFragment", "News Author: $authorId")
+//        viewModel.getAuthorName(authorId) { name ->
+//            authorName = name
+//        }
+//        return authorName    }
 
 
     override fun onNextNewsContentListener(v: View) {
